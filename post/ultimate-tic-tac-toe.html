@@ -1,0 +1,29 @@
+<html><head><link rel="stylesheet" type="text/css" href="/static/styles.css" /><link rel="stylesheet" type="text/css" href="/static/ultimate-tic-tac-toe/styles.css" /></head><body><img class="article-image" src="/static/img/tic-tac-toe.jpg" /><a class="main-page-link" href="/">fokot.github.io</a><a class="github-icon" href="https://github.com/fokot"><img src="/static/img/github.svg" /></a><div class="read"><h1>Ultimate Tic tac toe</h1><div class="tags">2019-12-07 on Clojure, Reagent, React, Game</div><p>
+  Long time I wanted to try <a href="https://reactjs.org/" target="_blank">React</a> and because I don't
+  like Javascript I did it in <a href="https://clojurescript.org/" target="_blank">Clojurescript</a>.
+  I was impressed by simplicity of the language and framework as well.
+  I wrote a little game you can play here. Computer is not too strong, so you have quite a big chance
+  of winning.</p>
+
+
+<p>
+  I liked that the standard library was immutable in contrast with <span class="x">Scala</span> where there is quite a bit of
+  mutable data. And the `lens` functions to work with deep data structures like <span class="x">(assoc-in m [k &amp; ks] v)</span>
+  or <span class="x">(update-in m ks f &amp; args)</span>. I also liked the idea of single <span class="x">atom</span>, single mutable reference to
+  store all application state.
+</p>
+<p>
+  Code is very simple and it is basically a single <a href="https://github.com/fokot/tic-tac-toe/blob/master/src/tic_tac_toe/core.cljs" target="_blank">file</a>.
+</p>
+<svg display="none">
+  <defs>
+    <g id="cross" class="a">
+      <line x1="10" y1="10" x2="86" y2="86" style="stroke:black;stroke-width:10"></line>
+      <line x1="10" y1="86" x2="86" y2="10" style="stroke:black;stroke-width:10"></line>
+</g>
+    <g id="circle">
+      <circle cx="48" cy="48" r="40" stroke="black" stroke-width="10" fill="none"></circle>
+</g></defs></svg>
+<div id="app"></div>
+<script src="/static/ultimate-tic-tac-toe/js/compiled/tic_tac_toe.js" type="text/javascript"></script>
+</div></body></html>

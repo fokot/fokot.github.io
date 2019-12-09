@@ -1,0 +1,24 @@
+@import scalatags.Text.svgTags.{svg, defs, g, line, circle}
+@import scalatags.Text.svgAttrs._
+@import com.fokot.Articles.x
+
+@p
+  I liked that the standard library was immutable in contrast with @x{Scala} where there is quite a bit of
+  mutable data. And the `lens` functions to work with deep data structures like @x{(assoc-in m [k & ks] v)}
+  or @x{(update-in m ks f & args)}. I also liked the idea of single @x{atom}, single mutable reference to
+  store all application state.
+
+@p
+  Code is very simple and it is basically a single @a(href:="https://github.com/fokot/tic-tac-toe/blob/master/src/tic_tac_toe/core.cljs", target:= "_blank"){file}.
+
+@svg(display:="none")
+  @defs
+    @g(id:="cross", `class`:="a")
+      @line(x1:="10", y1:="10", x2:="86", y2:="86", style:="stroke:black;stroke-width:10")
+      @line(x1:="10", y1:="86", x2:="86", y2:="10", style:="stroke:black;stroke-width:10")
+
+    @g(id:="circle")
+      @circle(cx:="48", cy:="48", r:="40", stroke:="black", strokeWidth:="10", fill:="none")
+
+@div(id:="app")
+@script(src:="/static/ultimate-tic-tac-toe/js/compiled/tic_tac_toe.js", `type`:="text/javascript")

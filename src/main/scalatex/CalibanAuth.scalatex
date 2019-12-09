@@ -1,0 +1,57 @@
+@import com.fokot.Articles.{removeOffset, x}
+
+@p
+  Let's look at ZIO first.
+  @x{ZIO[R, E, A]} has three parameters, the fist one is environment aka dependencies.
+  second one in error type and the last one is carried value. In this example we will
+  use simple type alias where the error is Throwable
+   type RIO[-R, +A]  = ZIO[R, Throwable, A]
+  To access the environment we use `access` method
+  ZIO.access[Console](_.console.putStrLn("I'm here"))
+  It is also possible to use `accessM` if the value returned will be another ZIO or
+  `environment` which will fill the `A` with `R`
+
+  @pre
+    @code(`class`:= "language-scala",
+    removeOffset("""
+      object ZioTest extends zio.App {
+
+        //  type ZEnv = Clock with Console with System with Random with Blocking
+
+        val welcome = ZIO.accessM[Console](_.console.putStrLn("Welcome"))
+
+        val getHours = ZIO.accessM[Clock](_.clock.currentDateTime)
+
+        override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] =
+          for {
+            _ <- welcome
+            h <- getHours
+            _ <- ZIO.accessM[Console](_.console.putStrLn(h.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)))
+          } yield 0
+      }""")
+    )
+
+  If we want to provide `R` to run our `ZIO` we can use provide method to provide new constant `R`
+  or we can use `provideSome` eliminate some of the dependencies (construct new `R` from existing)
+
+
+trait MyService {
+  def getValue: String
+}
+
+override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] =
+  (ZIO.accessM[MyService with Console](
+    r =>
+    r.console.putStrLn(r.getValue)
+  ) as 0)
+    .provideSome((env: ZEnv) => new MyService with Console {
+      override def getValue: String = "I'm cool service"
+      override val console: Console.Service[Any] = env.console
+    })
+
+@p
+  Now we know enough to use it with Caliban
+
+
+
+

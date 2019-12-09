@@ -1,0 +1,91 @@
+.solution {
+  background-color: green;
+}
+
+/*
+border and margins are not resing width/height
+http://learnlayout.com/box-sizing.html
+*/
+.cell {
+  box-sizing: border-box;
+}
+
+
+#board {
+  width: 300px;
+  height: 300px;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.cell:nth-child(3n+0),
+.cell:nth-child(3n+2) {
+  border-left: 4px solid black;
+}
+
+.cell:nth-child(-n+3),
+.cell:nth-child(4),
+.cell:nth-child(5),
+.cell:nth-child(6) {
+  border-bottom: 4px solid black;
+}
+
+button {
+  border-width: 2px;
+  border-color: #85C1E9;
+  border-style: solid;
+  border-radius: 15px;
+  background-color: #3498DB;
+  color: white;
+  padding: 10px 100px;
+  margin-top: 30px;
+  font-size: 15px;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+#game {
+  margin: 0 auto;
+  width: 300px;
+  text-align: center;
+  /* otherwise inline-blocks div (board cells) will have speces in between */
+  font-size: 0px;
+}
+
+.announcement {
+  position: relative;
+  top: -60%;
+  background-color: #3498DB;
+  font-size: 40px;
+  color: white;
+}
+
+@keyframes grow {
+  from {
+    transform: scale(0.5);
+    transform-origin: 20% 20%;
+  }
+  to {
+    transform: scale(1);
+    transform-origin: 20% 20%;
+  }
+}
+
+svg {
+  animation: grow 0.5s 0s 1 linear normal;
+}
+
+#app {
+  margin-top: 50px;
+}
+
+#app h1 {
+  display: none;
+}

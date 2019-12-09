@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">    
+  <link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+  <svg display="none">
+    <defs>
+      <g id="cross">
+        <line x1="10" y1="10" x2="86" y2="86" style="stroke:black;stroke-width:10" />
+        <line x1="10" y1="86" x2="86" y2="10" style="stroke:black;stroke-width:10" />
+      </g>
+
+      <g id="circle">
+        <circle cx="48" cy="48" r="40" stroke="black" stroke-width="10" fill="none" />
+      </g>
+    </defs>
+  </svg>
+
+
+
+<div id="game">
+  <h1>Ultimate tic-tac-toe</h1>
+  <div id="board">
+
+    <!-- <div class="row"> -->
+    <div class="cell solution">
+      <svg>
+        <use xlink:href="#cross"></use>
+      </svg>
+
+    </div>
+
+    <div class="cell circle">
+      <svg>
+        <use xlink:href="#circle"></use>
+      </svg>
+    </div>
+
+
+    <div class="cell">
+    </div>
+    <!-- </div> -->
+
+    <!-- <div class="row"> -->
+    <div class="cell"></div>
+    <div class="cell solution cross">
+      <svg>
+        <use xlink:href="#cross"></use>
+      </svg>
+
+    </div>
+    <div class="cell"></div>
+    <!-- </div> -->
+
+    <!-- <div class="row"> -->
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell solution cross">
+      <svg>
+        <use xlink:href="#cross"></use>
+      </svg>
+    </div>
+    <!-- </div> -->
+
+  </div>
+
+  <button>Restart game</button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+@import com.fokot.Articles
+
+@img(src:="/static/img/night-road.jpeg", style:="width:100%; height:100%")
+
+@a(`class`:="github-icon-main", href:="https://github.com/fokot")
+  @img(src:="/static/img/github.svg")
+
+@div(`class`:= "top-text")
+  fokot.github.io
+
+@div(`class`:= "bottom")
+  @div(`class`:= "bottom-text")
+    blog mostly about programming
+  @div(`class`:= "arrow-down",
+  onclick:="$('html, body').animate({scrollTop: window.innerHeight}, 2000);")
+
+@div(`class`:="read")
+  @for(article <- Articles.articles)
+    @div(`class`:="article-list")
+      @a(href:= article.link)
+        @h1
+          @article.title
+      @article.snippet
+      @div(`class`:= "tags-date")
+        @div(`class`:= "tags")
+          @article.tags.mkString(", ")
+        @div(`class`:= "date")
+          @article.date
+
