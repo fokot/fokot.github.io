@@ -1,6 +1,7 @@
 <html><head><link rel="stylesheet" type="text/css" href="/static/styles.css" /><link rel="stylesheet" type="text/css" href="/static/ultimate-tic-tac-toe/styles.css" /></head><body><img class="article-image" src="/static/img/tic-tac-toe.jpg" /><a class="main-page-link" href="/">fokot.github.io</a><a class="github-icon" href="https://github.com/fokot"><img src="/static/img/github.svg" /></a><div class="read"><h1>Ultimate Tic tac toe</h1><div class="tags">2019-12-07 on Clojure, Reagent, React, Game</div><p>
-  Long time I wanted to try <a href="https://reactjs.org/" target="_blank">React</a> and because I don't
-  like Javascript I did it in <a href="https://clojurescript.org/" target="_blank">Clojurescript</a>.
+  Long time I wanted to try <a href="https://reactjs.org/" target="_blank">React</a> and did it finally
+  at the end of 2015. Because I don't like Javascript I decided for
+  <a href="https://clojurescript.org/" target="_blank">Clojurescript</a>.
   I was impressed by simplicity of the language and framework as well.
   I wrote a little game you can play here. Computer is not too strong, so you have quite a big chance
   of winning.</p>
@@ -8,7 +9,7 @@
 
 <p>
   I liked that the standard library was immutable in contrast with <span class="x">Scala</span> where there is quite a bit of
-  mutable data. And the `lens` functions to work with deep data structures like <span class="x">(assoc-in m [k &amp; ks] v)</span>
+  mutable state. And the `lens` functions to work with deep data structures like <span class="x">(assoc-in m [k &amp; ks] v)</span>
   or <span class="x">(update-in m ks f &amp; args)</span>. I also liked the idea of single <span class="x">atom</span>, single mutable reference to
   store all application state.
 </p>

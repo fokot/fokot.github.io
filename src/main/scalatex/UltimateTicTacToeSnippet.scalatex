@@ -1,6 +1,7 @@
 @p
-  Long time I wanted to try @a(href:= "https://reactjs.org/", target:= "_blank"){React} and because I don't
-  like Javascript I did it in @a(href:= "https://clojurescript.org/", target:= "_blank"){Clojurescript}.
+  Long time I wanted to try @a(href:= "https://reactjs.org/", target:= "_blank"){React} and did it finally
+  at the end of 2015. Because I don't like Javascript I decided for
+  @a(href:= "https://clojurescript.org/", target:= "_blank"){Clojurescript}.
   I was impressed by simplicity of the language and framework as well.
   I wrote a little game you can play here. Computer is not too strong, so you have quite a big chance
   of winning.

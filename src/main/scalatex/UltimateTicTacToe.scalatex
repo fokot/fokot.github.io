@@ -4,7 +4,7 @@
 
 @p
   I liked that the standard library was immutable in contrast with @x{Scala} where there is quite a bit of
-  mutable data. And the `lens` functions to work with deep data structures like @x{(assoc-in m [k & ks] v)}
+  mutable state. And the `lens` functions to work with deep data structures like @x{(assoc-in m [k & ks] v)}
   or @x{(update-in m ks f & args)}. I also liked the idea of single @x{atom}, single mutable reference to
   store all application state.
 
