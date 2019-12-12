@@ -33,7 +33,7 @@ object Articles {
         name,
         title,
         snippet,
-        toArticle(title, snippet, article, image, tags, date),
+        toArticle(title, snippet, article, image, tags, date, s"post/$name"),
         tags,
         date,
         image,
@@ -76,7 +76,7 @@ object Articles {
       )
     )
 
-  def toArticle(title: String, snippet: Frag, article: Frag, image: String, tags: List[String], date: String): Frag =
+  def toArticle(title: String, snippet: Frag, article: Frag, image: String, tags: List[String], date: String, pageLink: String): Frag =
     html(
       head(
         styles,
@@ -100,11 +100,12 @@ object Articles {
           div(`class`:="tags", date + " on " + tags.mkString(", ")),
           snippet,
           article
-        )
+        ),
+        disqus(pageLink)
       )
     )
 
-  def toUltimateTicTacToeArticle(title: String, snippet: Frag, article: Frag, image: String, tags: List[String], date: String): Frag =
+  def toUltimateTicTacToeArticle(title: String, snippet: Frag, article: Frag, image: String, tags: List[String], date: String, pageLink: String): Frag =
     html(
       head(
         styles,
@@ -130,7 +131,8 @@ object Articles {
           div(`class`:="tags", date + " on " + tags.mkString(", ")),
           snippet,
           article
-        )
+        ),
+        disqus(pageLink)
       )
     )
 
@@ -149,7 +151,8 @@ object Articles {
       "Ultimate Tic tac toe",
       UltimateTicTacToeSnippet(),
       toUltimateTicTacToeArticle("Ultimate Tic tac toe", UltimateTicTacToeSnippet(), UltimateTicTacToe(),
-        "/static/img/tic-tac-toe.jpg", List("Clojure", "Reagent", "React", "Game"), "2019-12-07"
+        "/static/img/tic-tac-toe.jpg", List("Clojure", "Reagent", "React", "Game"), "2019-12-07",
+        "post/ultimate-tic-tac-toe.html"
       ),
       List("Clojure", "Reagent", "React", "Game"),
       "2019-12-07",
@@ -166,5 +169,31 @@ object Articles {
 
   def x(s: String): Text.TypedTag[String] =
     span(`class`:="x", s)
+
+  def disqus(link: String): Frag =
+    div(
+      `class`:="read",
+      id:="disqus_thread",
+      script(
+        s"""
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = ${link};  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = ${link}; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://fokot-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+        """
+    ),
+  )
+
 
 }
