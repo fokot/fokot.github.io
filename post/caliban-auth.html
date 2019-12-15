@@ -6,13 +6,14 @@
   In this article I will show you how to do the authentication in Caliban.</p>
 
 
+<h2>ZIO</h2>
 <p>
   Let's look at ZIO first.
   <span class="x">ZIO[R, E, A]</span> has three parameters, the fist one is environment aka dependencies.
   second one in error type and the last one is carried value. In this example we will
   use simple type alias where the error is Throwable
   <span class="x">type RIO[-R, +A]  = ZIO[R, Throwable, A]</span>
-  To access the environment we use `access` method
+  To access the environment we use <span class="x">access</span> method
   <span class="x">ZIO.access[Console](_.console.putStrLn(&quot;I'm here&quot;))</span>
   It is also possible to use <span class="x">accessM</span> if the value returned will be another ZIO or
   <span class="x">environment</span> which will fill the <span class="x">A</span> with <span class="x">R</span>
@@ -34,8 +35,8 @@ object ZioTest extends zio.App {
     } yield 0
 }</code></pre>
 
-  If we want to provide `R` to run our `ZIO` we can use provide method to provide new constant `R`
-  or we can use `provideSome` eliminate some of the dependencies (construct new `R` from existing)
+  If we want to provide <span class="x">R</span> to run our <span class="x">ZIO</span> we can use provide method to provide new constant <span class="x">R</span>
+  or we can use <span class="x">provideSome</span> eliminate some of the dependencies (construct new <span class="x">R</span> from existing)
 
   <pre><code class="language-scala">
 trait MyService {
@@ -53,11 +54,76 @@ override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] =
     })
      </code></pre>
 </p>
+<h2>Caliban</h2>
 <p>
   Now we know enough to use it with Caliban. In Caliban GraphQL schema is derived from case classes.
   Every field can be either the case class of result type or ZIO of that type.
   <pre><code class="language-scala">
-a </code></pre>
+// environment used to resolve the schema
+type Env = Storage with Console with Auth with WC[Config] with Clock
+
+// read value lazily
+type Z[A] = RIO[Env, A]
+
+case class Queries(
+  allBooks: Z[List[Book]],
+  myBooks: Z[List[Book]]
+)
+  </code></pre>
+  Imagine I want to access <span class="x">allBooks</span> only by <span class="x">Admin</span> and <span class="x">myBooks</span> by all logged in users.
+  With ZIO it can be done easily
+  <pre><code class="language-scala">
+sealed trait Role
+object Role {
+  final case object Editor extends Role
+  final case object Viewer extends Role
+}
+
+case class User(
+  login: String,
+  role: Role
+)
+
+trait Auth {
+  def auth: Auth.Service[Any]
+}
+
+object Auth {
+
+  trait Service[R] {
+    def token: RIO[R, User]
+  }
+}
+
+type Authorized = RIO[Auth, User]
+
+val isAuthenticated: Authorized = ZIO.accessM[Auth](_.auth.token)
+
+/**
+ * Will succeed if user has at least one of specified roles
+ */
+def hasRole(r: Role*): Authorized = isAuthenticated.filterOrFail(t =&gt; r.contains(t.role))(AuthException(&quot;Permission denied&quot;))
+
+val isAdmin: Authorized = hasRole(Role.Admin)
+
+val allBooks: Z[List[Book]] =
+  isAdmin *&gt; ZIO.accessM[Env](_.storage.getAllBooks().map(_.map(bookToGQL)))
+
+val myBooks: Z[List[Book]] =
+  isAuthenticated &gt;&gt;= (u =&gt; ZIO.accessM[Env](_.storage.getBooksForUser(u).map(_.map(bookToGQL))))
+  </code></pre>
+
+  <span class="x">a *&gt; b</span> is like flatMap ignoring value produced by first effect, so it can be rewritten to <span class="x">a.flatMap(_ =&gt; b)</span>.
+  If we need value like in <span class="x">myBooks</span> we can use <span class="x">flatMap</span> or its alias <span class="x">&gt;&gt;=</span>.
+</p>
+<h2>Final words</h2>
+<p>
+  Full example can be found on my <a href="https://github.com/fokot/caliban-example" target="_blank">github</a>.
+  Definitely take a look at <a href="https://ghostdogpr.github.io/caliban/" target="_blank">Caliban</a> and
+  <a href="https://zio.dev/" target="_blank">ZIO</a>, it's awesome.
+
+
+
 
 
 

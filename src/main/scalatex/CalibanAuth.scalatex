@@ -1,12 +1,13 @@
 @import com.fokot.Utils.{scalaCode, x}
 
+@h2{ZIO}
 @p
   Let's look at ZIO first.
   @x{ZIO[R, E, A]} has three parameters, the fist one is environment aka dependencies.
   second one in error type and the last one is carried value. In this example we will
   use simple type alias where the error is Throwable
   @x{type RIO[-R, +A]  = ZIO[R, Throwable, A]}
-  To access the environment we use `access` method
+  To access the environment we use @x{access} method
   @x{ZIO.access[Console](_.console.putStrLn("I'm here"))}
   It is also possible to use @x{accessM} if the value returned will be another ZIO or
   @x{environment} which will fill the @x{A} with @x{R}
@@ -28,8 +29,8 @@
         } yield 0
     }""")
 
-  If we want to provide `R` to run our `ZIO` we can use provide method to provide new constant `R`
-  or we can use `provideSome` eliminate some of the dependencies (construct new `R` from existing)
+  If we want to provide @x{R} to run our @x{ZIO} we can use provide method to provide new constant @x{R}
+  or we can use @x{provideSome} eliminate some of the dependencies (construct new @x{R} from existing)
 
   @scalaCode("""
     trait MyService {
@@ -47,10 +48,76 @@
         })
      """)
 
+@h2{Caliban}
 @p
   Now we know enough to use it with Caliban. In Caliban GraphQL schema is derived from case classes.
   Every field can be either the case class of result type or ZIO of that type.
-  @scalaCode(""" a """)
+  @scalaCode("""
+    // environment used to resolve the schema
+    type Env = Storage with Console with Auth with WC[Config] with Clock
+
+    // read value lazily
+    type Z[A] = RIO[Env, A]
+
+    case class Queries(
+      allBooks: Z[List[Book]],
+      myBooks: Z[List[Book]]
+    )
+  """)
+  Imagine I want to access @x{allBooks} only by @x{Admin} and @x{myBooks} by all logged in users.
+  With ZIO it can be done easily
+  @scalaCode("""
+    sealed trait Role
+    object Role {
+      final case object Editor extends Role
+      final case object Viewer extends Role
+    }
+
+    case class User(
+      login: String,
+      role: Role
+    )
+
+    trait Auth {
+      def auth: Auth.Service[Any]
+    }
+
+    object Auth {
+
+      trait Service[R] {
+        def token: RIO[R, User]
+      }
+    }
+
+    type Authorized = RIO[Auth, User]
+
+    val isAuthenticated: Authorized = ZIO.accessM[Auth](_.auth.token)
+
+    /**
+     * Will succeed if user has at least one of specified roles
+     */
+    def hasRole(r: Role*): Authorized = isAuthenticated.filterOrFail(t => r.contains(t.role))(AuthException("Permission denied"))
+
+    val isAdmin: Authorized = hasRole(Role.Admin)
+
+    val allBooks: Z[List[Book]] =
+      isAdmin *> ZIO.accessM[Env](_.storage.getAllBooks().map(_.map(bookToGQL)))
+
+    val myBooks: Z[List[Book]] =
+      isAuthenticated >>= (u => ZIO.accessM[Env](_.storage.getBooksForUser(u).map(_.map(bookToGQL))))
+  """)
+
+  @x{a *> b} is like flatMap ignoring value produced by first effect, so it can be rewritten to @x{a.flatMap(_ => b)}.
+  If we need value like in @x{myBooks} we can use @x{flatMap} or its alias @x{>>=}.
+
+@h2{Final words}
+@p
+  Full example can be found on my @a(href:= "https://github.com/fokot/caliban-example", target:= "_blank"){github}.
+  Definitely take a look at @a(href:= "https://ghostdogpr.github.io/caliban/", target:= "_blank"){Caliban} and
+  @a(href:= "https://zio.dev/", target:= "_blank"){ZIO}, it's awesome.
+
+
+
 
 
 
