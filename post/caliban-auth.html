@@ -1,6 +1,6 @@
 <html><head><link rel="stylesheet" type="text/css" href="/static/styles.css" /><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/themes/prism.css" /><script src="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/plugins/autoloader/prism-autoloader.min.js"></script></head><body><img class="article-image" src="/static/img/sunset.jpg" /><a class="main-page-link" href="/">fokot.github.io</a><a class="github-icon" href="https://github.com/fokot"><img src="/static/img/github.svg" /></a><div class="read"><h1>Authentication in Caliban</h1><div class="tags">2019-12-07 on Caliban, ZIO, GraphQL, Scala</div><p>
-  We are building GraphQL backend at work and we decided to use
-  <a href="https://ghostdogpr.github.io/caliban/" target="_blank">Caliban</a> a new
+  We are building GraphQL service at work and we decided to use
+  <a href="https://ghostdogpr.github.io/caliban/" target="_blank">Caliban</a> - a new
   promising GraphQL backend in Scala. Library is based on
   <a href="https://zio.dev/" target="_blank">ZIO</a> which makes many things simpler.
   In this article I will show you how to do the authentication in Caliban.</p>
@@ -11,14 +11,13 @@
   <span class="x">ZIO[R, E, A]</span> has three parameters, the fist one is environment aka dependencies.
   second one in error type and the last one is carried value. In this example we will
   use simple type alias where the error is Throwable
-   type RIO[-R, +A]  = ZIO[R, Throwable, A]
+  <span class="x">type RIO[-R, +A]  = ZIO[R, Throwable, A]</span>
   To access the environment we use `access` method
-  ZIO.access[Console](_.console.putStrLn(&quot;I'm here&quot;))
-  It is also possible to use `accessM` if the value returned will be another ZIO or
-  `environment` which will fill the `A` with `R`
+  <span class="x">ZIO.access[Console](_.console.putStrLn(&quot;I'm here&quot;))</span>
+  It is also possible to use <span class="x">accessM</span> if the value returned will be another ZIO or
+  <span class="x">environment</span> which will fill the <span class="x">A</span> with <span class="x">R</span>
 
-  <pre>
-    <code class="language-scala">
+  <pre><code class="language-scala">
 object ZioTest extends zio.App {
 
   //  type ZEnv = Clock with Console with System with Random with Blocking
@@ -33,12 +32,12 @@ object ZioTest extends zio.App {
       h &lt;- getHours
       _ &lt;- ZIO.accessM[Console](_.console.putStrLn(h.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)))
     } yield 0
-}</code>
-</pre>
+}</code></pre>
+
   If we want to provide `R` to run our `ZIO` we can use provide method to provide new constant `R`
   or we can use `provideSome` eliminate some of the dependencies (construct new `R` from existing)
 
-</p>
+  <pre><code class="language-scala">
 trait MyService {
   def getValue: String
 }
@@ -52,9 +51,16 @@ override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] =
       override def getValue: String = &quot;I'm cool service&quot;
       override val console: Console.Service[Any] = env.console
     })
-
+     </code></pre>
+</p>
 <p>
-  Now we know enough to use it with Caliban
+  Now we know enough to use it with Caliban. In Caliban GraphQL schema is derived from case classes.
+  Every field can be either the case class of result type or ZIO of that type.
+  <pre><code class="language-scala">
+a </code></pre>
+
+
+
 
 
 

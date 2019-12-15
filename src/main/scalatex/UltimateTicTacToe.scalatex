@@ -1,6 +1,6 @@
 @import scalatags.Text.svgTags.{svg, defs, g, line, circle}
 @import scalatags.Text.svgAttrs._
-@import com.fokot.Articles.x
+@import com.fokot.Utils.x
 
 @p
   I liked that the standard library was immutable in contrast with @x{Scala} where there is quite a bit of

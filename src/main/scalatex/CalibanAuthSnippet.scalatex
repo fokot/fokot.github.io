@@ -1,6 +1,6 @@
 @p
-  We are building GraphQL backend at work and we decided to use
-  @a(href:= "https://ghostdogpr.github.io/caliban/", target:= "_blank"){Caliban} a new
+  We are building GraphQL service at work and we decided to use
+  @a(href:= "https://ghostdogpr.github.io/caliban/", target:= "_blank"){Caliban} - a new
   promising GraphQL backend in Scala. Library is based on
   @a(href:= "https://zio.dev/", target:= "_blank"){ZIO} which makes many things simpler.
   In this article I will show you how to do the authentication in Caliban.
