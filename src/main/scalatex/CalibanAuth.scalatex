@@ -110,6 +110,38 @@
   @x{a *> b} is like flatMap ignoring value produced by first effect, so it can be rewritten to @x{a.flatMap(_ => b)}.
   If we need value like in @x{myBooks} we can use @x{flatMap} or its alias @x{>>=}.
 
+@p
+  Resolver's part is done, now we need to get Auth service to our environment. I created simple
+  @x{Auth.Service} implementation which can be initialised with @x{Task[User]}
+  @scalaCode("""
+    object Auth {
+
+      trait Service[R] {
+        def currentUser: RIO[R, User]
+      }
+
+      case class SimpleService(currentUser: Task[User]) extends Auth.Service[Any]
+    }
+  """)
+  And then I can parse the token in http4s and pass it to the environment with @x{provideSome}.
+  You can find the code in the
+  @a(href:="https://github.com/fokot/caliban-example/blob/master/src/main/scala/com/fokot/Main.scala", target:= "_blank"){Main class}.
+  The idea is to extract @x{User} from token in @x{ZEnv} and the provide initialised @x{Auth} service
+  to GraphQL interpreter
+  @scalaCode("""
+  HttpRoutes
+    .of[RIO[ZEnv, *]] {
+      case req@POST -> Root / "api" / "graphql" => {
+        // this runs with environment ZEnv
+        val user = extractUserFromToken(request.headers.get(Authorization).map(_.value))
+        val qRequest = req.attemptAs[GraphQLRequest].value.absolve
+        // this runs with environment Auth
+        interpreter
+          .execute(query.query, query.operationName, query.variables.getOrElse(Map()))
+          .provide(SimpleService(user))
+      }
+  """)
+
 @h2{Final words}
 @p
   Full example can be found on my @a(href:= "https://github.com/fokot/caliban-example", target:= "_blank"){github}.

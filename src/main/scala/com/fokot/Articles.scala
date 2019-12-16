@@ -71,7 +71,7 @@ object Articles {
       CalibanAuthSnippet(),
       CalibanAuth(),
       List("Caliban", "ZIO", "GraphQL", "Scala"),
-      "2019-12-07",
+      "2019-12-16",
       "sunset.jpg",
       simpleArticle
     ),

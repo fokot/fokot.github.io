@@ -1,4 +1,4 @@
-<html><head><link rel="stylesheet" type="text/css" href="/static/styles.css" /><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/themes/prism.css" /><script src="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/plugins/autoloader/prism-autoloader.min.js"></script></head><body><img class="article-image" src="/static/img/sunset.jpg" /><a class="main-page-link" href="/">fokot.github.io</a><a class="github-icon" href="https://github.com/fokot"><img src="/static/img/github.svg" /></a><div class="read"><h1>Authentication in Caliban</h1><div class="tags">2019-12-07 on Caliban, ZIO, GraphQL, Scala</div><p>
+<html><head><link rel="stylesheet" type="text/css" href="/static/styles.css" /><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/themes/prism.css" /><script src="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.17.1/plugins/autoloader/prism-autoloader.min.js"></script></head><body><img class="article-image" src="/static/img/sunset.jpg" /><a class="main-page-link" href="/">fokot.github.io</a><a class="github-icon" href="https://github.com/fokot"><img src="/static/img/github.svg" /></a><div class="read"><h1>Authentication in Caliban</h1><div class="tags">2019-12-16 on Caliban, ZIO, GraphQL, Scala</div><p>
   We are building GraphQL service at work and we decided to use
   <a href="https://ghostdogpr.github.io/caliban/" target="_blank">Caliban</a> - a new
   promising GraphQL backend in Scala. Library is based on
@@ -115,6 +115,38 @@ val myBooks: Z[List[Book]] =
 
   <span class="x">a *&gt; b</span> is like flatMap ignoring value produced by first effect, so it can be rewritten to <span class="x">a.flatMap(_ =&gt; b)</span>.
   If we need value like in <span class="x">myBooks</span> we can use <span class="x">flatMap</span> or its alias <span class="x">&gt;&gt;=</span>.
+</p>
+<p>
+  Resolver's part is done, now we need to get Auth service to our environment. I created simple
+  <span class="x">Auth.Service</span> implementation which can be initialised with <span class="x">Task[User]</span>
+  <pre><code class="language-scala">
+object Auth {
+
+  trait Service[R] {
+    def currentUser: RIO[R, User]
+  }
+
+  case class SimpleService(currentUser: Task[User]) extends Auth.Service[Any]
+}
+  </code></pre>
+  And then I can parse the token in http4s and pass it to the environment with <span class="x">provideSome</span>.
+  You can find the code in the
+  <a href="https://github.com/fokot/caliban-example/blob/master/src/main/scala/com/fokot/Main.scala" target="_blank">Main class</a>.
+  The idea is to extract <span class="x">User</span> from token in <span class="x">ZEnv</span> and the provide initialised <span class="x">Auth</span> service
+  to GraphQL interpreter
+  <pre><code class="language-scala">
+HttpRoutes
+  .of[RIO[ZEnv, *]] {
+    case req@POST -&gt; Root / &quot;api&quot; / &quot;graphql&quot; =&gt; {
+      // this runs with environment ZEnv
+      val user = extractUserFromToken(request.headers.get(Authorization).map(_.value))
+      val qRequest = req.attemptAs[GraphQLRequest].value.absolve
+      // this runs with environment Auth
+      interpreter
+        .execute(query.query, query.operationName, query.variables.getOrElse(Map()))
+        .provide(SimpleService(user))
+    }
+  </code></pre>
 </p>
 <h2>Final words</h2>
 <p>
