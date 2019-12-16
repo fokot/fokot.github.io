@@ -134,7 +134,7 @@
       case req@POST -> Root / "api" / "graphql" => {
         // this runs with environment ZEnv
         val user = extractUserFromToken(request.headers.get(Authorization).map(_.value))
-        val qRequest = req.attemptAs[GraphQLRequest].value.absolve
+        val query = req.attemptAs[GraphQLRequest].value.absolve
         // this runs with environment Auth
         interpreter
           .execute(query.query, query.operationName, query.variables.getOrElse(Map()))
