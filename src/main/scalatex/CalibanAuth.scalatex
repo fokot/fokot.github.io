@@ -13,19 +13,22 @@
   @x{environment} which will fill the @x{A} with @x{R}
 
   @scalaCode("""
+    import zio.clock.Clock
+    import zio.console.Console
+
     object ZioTest extends zio.App {
 
       //  type ZEnv = Clock with Console with System with Random with Blocking
 
-      val welcome = ZIO.accessM[Console](_.console.putStrLn("Welcome"))
+      val welcome = ZIO.accessM[Console](_.get.putStrLn("Welcome"))
 
-      val getHours = ZIO.accessM[Clock](_.clock.currentDateTime)
+      val getHours = ZIO.accessM[Clock](_.get.currentDateTime)
 
       override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] =
         for {
           _ <- welcome
           h <- getHours
-          _ <- ZIO.accessM[Console](_.console.putStrLn(h.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)))
+          _ <- ZIO.accessM[Console](_.get.putStrLn(h.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)))
         } yield 0
     }""")
 
@@ -78,15 +81,10 @@
       role: Role
     )
 
-    trait Auth {
-      def auth: Auth.Service[Any]
-    }
+    type Auth = Has[AuthService[Any]]
 
-    object Auth {
-
-      trait Service[R] {
-        def token: RIO[R, User]
-      }
+    trait AuthService[R] {
+      def token: RIO[R, User]
     }
 
     type Authorized = RIO[Auth, User]
@@ -112,16 +110,13 @@
 
 @p
   Resolver's part is done, now we need to get Auth service to our environment. I created simple
-  @x{Auth.Service} implementation which can be initialised with @x{Task[User]}
+  @x{AuthService} implementation which can be initialised with @x{Task[User]}
   @scalaCode("""
-    object Auth {
-
-      trait Service[R] {
-        def currentUser: RIO[R, User]
-      }
-
-      case class SimpleService(currentUser: Task[User]) extends Auth.Service[Any]
+    trait AuthService[R] {
+      def currentUser: RIO[R, User]
     }
+
+    case class SimpleService(currentUser: Task[User]) extends AuthService[Any]
   """)
   And then I can parse the token in http4s and pass it to the environment with @x{provideSome}.
   You can find the code in the
